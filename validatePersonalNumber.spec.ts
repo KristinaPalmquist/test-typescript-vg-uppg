@@ -17,6 +17,11 @@ describe("validatePersonalNumber", () => {
     expect(actualResponse).toEqual(expectedResponse);
   });
   it("should return false if personal number is invalid", () => {
+    const actualResponse = validatePersonalNumber("550713-140B");
+    const expectedResponse = false;
+    expect(actualResponse).toEqual(expectedResponse);
+  });
+  it("should return false if personal number is invalid", () => {
     const actualResponse = validatePersonalNumber("50713-1405");
     const expectedResponse = false;
     expect(actualResponse).toEqual(expectedResponse);

@@ -5,8 +5,7 @@ export const validateText = (text: string): boolean => {
     return false;
   } else if (regexContainsNumbers.test(text.substring(0, 1))) {
     return false;
-  } else if (text === undefined) {
-    return false;
+
   } else if (text.length < 2) {
     return false;
   } else if (text.length > 40) {

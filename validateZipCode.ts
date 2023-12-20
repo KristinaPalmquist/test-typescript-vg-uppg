@@ -1,18 +1,15 @@
 export const validateZipCode = (zipCode: string): boolean => {
+  const regexContainsLetters = /[a-zA-Z]/g;
+
   if (zipCode.includes(" ")) {
     zipCode = zipCode.replace(" ", "");
+  }
 
-  } 
-
-  if (zipCode === undefined) {
+  if (zipCode.length !== 5) {
     return false;
-  } else if (zipCode.length !== 5) {
+  } else if (zipCode.match(regexContainsLetters)) {
     return false;
-  } else if (isNaN(Number(zipCode))) {
-    return false;
-  } else if (zipCode.length === 5 && !isNaN(Number(zipCode))) {
-    return true;
   } else {
-    return false;
+    return true;
   }
 };

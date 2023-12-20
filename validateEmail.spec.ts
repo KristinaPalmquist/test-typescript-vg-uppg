@@ -7,6 +7,11 @@ describe("validateEmail", () => {
     expect(actualResponse).toEqual(expectedResponse);
   });
   it("should return false if the email is invalid", () => {
+    const actualResponse = validateEmail("");
+    const expectedResponse = false;
+    expect(actualResponse).toEqual(expectedResponse);
+  });
+  it("should return false if the email is invalid", () => {
     const actualResponse = validateEmail("@gmail.com");
     const expectedResponse = false;
     expect(actualResponse).toEqual(expectedResponse);

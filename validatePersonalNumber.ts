@@ -6,7 +6,7 @@ export const validatePersonalNumber = (personalNumber: string): boolean => {
   const month = personalNumber.substring(2, 4);
   const day = personalNumber.substring(4, 6);
 
-  if (personalNumber === undefined) {
+  if (personalNumber === "") {
     return false;
   } else if (personalNumber.length !== 10) {
     return false;
