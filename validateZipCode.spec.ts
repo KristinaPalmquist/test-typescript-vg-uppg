@@ -12,7 +12,7 @@ describe("validateZipCode", () => {
     expect(actualResponse).toEqual(expectedResponse);
   });
   it("should return false if zip code is invalid", () => {
-    const actualResponse = validateZipCode("11222");
+    const actualResponse = validateZipCode("111222");
     const expectedResponse = false;
     expect(actualResponse).toEqual(expectedResponse);
   });
