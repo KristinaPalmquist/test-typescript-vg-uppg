@@ -1,29 +1,25 @@
+import axios from "axios";
+
 export type CoordinatesType = {
-  name: string;
-  latitude: number;
-  longitude: number;
-  country: string;
+  lat: number;
+  lng: number;
 };
 
-export const coordinatesMock = {
-  name: "Värnamo",
-  latitude: 59.32932349999999,
-  longitude: 18.0685808,
-  country: "Sweden",
-};
-
-export const getCoordinates = async (city: string, country: string) => {
-  (
-    await fetch(
+export const getCoordinates = async (
+  city: string,
+  country: string
+): Promise<CoordinatesType> => {
+  try {
+    const response = await axios.get(
       `https://api.api-ninjas.com/v1/geocoding?city=${city}&country=${country}`
-    )
-  )
-    .json()
-    .then((data) => data.results[0].geometry.location);
-
-  const response = await fetch(
-    `https://api.api-ninjas.com/v1/geocoding?city=${city}&country=${country}`
-  );
-  const data = await response.json();
-  return data.results[0].geometry.location;
+    );
+    const coordinates: CoordinatesType = {
+      lat: response.data.latitude,
+      lng: response.data.longitude,
+    };
+    return coordinates;
+  } catch (error) {
+    console.log("An error has occured");
+    return { lat: 0, lng: 0 };
+  }
 };

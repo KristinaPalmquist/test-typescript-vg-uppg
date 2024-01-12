@@ -11,6 +11,10 @@ export type ContactType = {
   country: string;
 };
 
+type CreateContactFunction = (contactData: ContactType) => Promise<ContactType>;
+type GetContactsFunction = () => Promise<ContactType[]>;
+type GetContactById = (id: string) => Promise<ContactType | null>;
+
 const contactSchema = new mongoose.Schema<ContactType>({
   firstname: String,
   lastname: String,
@@ -22,29 +26,22 @@ const contactSchema = new mongoose.Schema<ContactType>({
   country: String,
 });
 
-const ContactModel = mongoose.model<ContactType>("Contact", contactSchema);
+const ContactModel = mongoose.model("contact", contactSchema);
 
-export const createContact = async (contact: ContactType) => {
-  return await new ContactModel(contact).save();
+export const createContact: CreateContactFunction = async (
+  contactData: ContactType
+): Promise<ContactType> => {
+  return (await new ContactModel(contactData).save()).toObject();
 };
 
-export const getContacts = async () => {
+export const getContacts: GetContactsFunction = async (): Promise<
+  ContactType[]
+> => {
   return await ContactModel.find();
 };
-export const getContact = async (id: string) => {
+export const getContactById: GetContactById = async (
+  id: string
+): Promise<ContactType | null> => {
   return await ContactModel.findById(id);
 };
-
-// const connectionString = process.env.MONGO_CONNECTION_STRING;
-// const databaseName = process.env.MONGO_DATABASE_NAME;
-
-// export const connect = () => {
-//   mongoose
-//     .connect(`${connectionString}/${databaseName}`, {
-//       // useNewUrlParser: true,
-//       // useUnifiedTopology: true,
-//       // useCreateIndex: true
-//     })
-//     .then(() => console.log("MongoDB connected"))
-//     .catch((err) => console.log(err));
-// };
+export const isValidId = (id: string) => mongoose.Types.ObjectId.isValid(id);

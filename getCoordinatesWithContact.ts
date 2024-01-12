@@ -5,10 +5,9 @@ export const getCoordinatesWithContact = (
   contact: ContactType,
   coordinates: CoordinatesType
 ) => {
-  console.log({ lat: coordinates.latitude, lng: coordinates.longitude });
   return {
     ...contact,
-    lat: coordinates.latitude,
-    lng: coordinates.longitude,
+    lat: coordinates.lat,
+    lng: coordinates.lng,
   };
 };

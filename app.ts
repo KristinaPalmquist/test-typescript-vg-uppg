@@ -1,16 +1,24 @@
-import express, { json } from "express";
-import { ContactType, createContact, getContact } from "./database";
-import { validateText } from "./validateText";
-import { validateEmail } from "./validateEmail";
-import { validatePersonalNumber } from "./validatePersonalNumber";
-import { validateZipCode } from "./validateZipCode";
+import express, { json, Request, Response } from "express";
+import mongoose from "mongoose";
+import { ContactType } from "./database";
+import { validateText } from "./dataValidation/validateText";
+import { validateEmail } from "./dataValidation/validateEmail";
+import { validatePersonalNumber } from "./dataValidation/validatePersonalNumber";
+import { validateZipCode } from "./dataValidation/validateZipCode";
+import { getCoordinatesWithContact } from "./getCoordinatesWithContact";
+import { getCoordinates } from "./coordinates";
 
 export type AppProps = {
-  createContact: (contact: ContactType) => ContactType;
-  getContact: (id: string) => ContactType;
+  createContact: (contactData: ContactType) => Promise<ContactType>;
+  getContactById: (id: string) => Promise<ContactType | null>;
+  getContacts: () => Promise<ContactType[]>;
 };
 
-export const makeApp = ({ createContact, getContact }: AppProps) => {
+export const makeApp = ({
+  createContact,
+  getContactById,
+  getContacts,
+}: AppProps) => {
   const app = express();
   app.use(json());
 
@@ -44,32 +52,39 @@ export const makeApp = ({ createContact, getContact }: AppProps) => {
     if (errors.length) {
       return res.status(400).json({ errors });
     } else {
-      try {
-        validateText(req.body.firstname);
-        validateText(req.body.lastname);
-        validateEmail(req.body.email);
-        validatePersonalNumber(req.body.personalnumber);
-        validateText(req.body.address);
-        validateZipCode(req.body.zipCode);
-        validateText(req.body.city);
-        validateText(req.body.country);
-      } catch (error) {
-        return res.status(400)
-        // .json({ error: "Something went wrong" });
-      }
+      validateText(req.body.firstname);
+      validateText(req.body.lastname);
+      validateEmail(req.body.email);
+      validatePersonalNumber(req.body.personalnumber);
+      validateText(req.body.address);
+      validateZipCode(req.body.zipCode);
+      validateText(req.body.city);
+      validateText(req.body.country);
+      const coordinates = await getCoordinates(req.body.city, req.body.country);
+      const newContact = getCoordinatesWithContact(req.body, coordinates);
       const contact = await createContact(req.body);
       res.json(contact);
-      return res.status(200)
-      // .json({ message: "Contact created" });
+      return res.status(200);
+    }
+  });
+
+  app.get("/contacts", async (req: Request, res: Response) => {
+    const contacts: ContactType[] = await getContacts();
+    res.json(contacts);
+    if (contacts) {
+      return res.status(200);
     }
   });
 
   app.get("/contact/:id", async (req, res) => {
-    const contact: ContactType = await getContact(req.params.id);
-    res.json(contact);
-    return res.status(200)
-    // .json({ message: "Contact fetched" });
+    if (mongoose.isValidObjectId(req.params.id)) {
+      const contact: ContactType | null = await getContactById(req.params.id);
+      if (contact) {
+        return res.status(200).json(contact);
+      }
+    } else {
+      return res.status(400).json({ error: "Id is not valid" });
+    }
   });
-
   return app;
 };
